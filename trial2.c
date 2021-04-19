@@ -41,6 +41,7 @@ void * exit_thread(void *arg)
     out[j-1]=1;
     printf("thread id %u is exiting 2\n", (unsigned int)pthread_self());
 }
+
 int main()
 {
     pthread_t threadID;
