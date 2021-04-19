@@ -1,0 +1,3 @@
+username, time, cost
+vatsal, 10, 300
+akki, 20, 600
