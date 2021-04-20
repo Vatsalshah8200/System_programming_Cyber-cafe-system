@@ -1,5 +1,15 @@
 #include "config.h"
 
+
+void clean_stdin(void)
+{
+    int c;
+    do
+    {
+        c = getchar();
+    } while (c != '\n' && c != EOF);
+}
+
 int intial_screen()
 {
     for(int i=0;i<10;i++)
@@ -21,7 +31,7 @@ int intial_screen()
 
     scanf("%d",&choice);
     printf("\n");
-
+    clean_stdin();
     return choice;
 }
 
@@ -36,11 +46,14 @@ void Display_login_user()
             printf("pc No. : %d \n" ,login_users[i].pcdet.pc_no);
             printf("Username : %s \n",login_users[i].username);
             printf("ThreadId : %u \n",login_users[i].threadId);
-            // double sec=difftime(login_users[i].logout,login_users[i].login);
-            // double h = (sec/3600); 
-            // login_users[i].min = (sec -(3600*h))/60;
-            // double payslip=login_users[i].min*(per_hour_cost/60);
-            // login_users[i].payment = payslip;
+
+            login_users[i].logout=time(NULL);
+            double sec=difftime(login_users[i].logout,login_users[i].login);
+            double h = (sec/3600); 
+            login_users[i].min = (sec -(3600*h))/60;
+            printf("Minute passed : %f \n",login_users[i].min);
+            double payslip=login_users[i].min*(per_hour_cost/60);
+            login_users[i].payment = payslip;
             printf("\n");
         }
     }
@@ -83,12 +96,12 @@ void write_logged_in(int findpc)
 	strcat(tempArr, year);
     strcat(tempArr, "/");
     strcat(tempArr, ", ");
-    char snum[5];
-    sprintf(snum, "%0.2f", login_users[findpc].min);
+    char snum[10];
+    sprintf(snum, "%f", login_users[findpc].min);
     strcat(tempArr, snum);
     strcat(tempArr, ", ");
-    char mnum[5];
-    sprintf(mnum, "%0.2f", login_users[findpc].payment);
+    char mnum[10];
+    sprintf(mnum, "%f", login_users[findpc].payment);
     strcat(tempArr, mnum);
 
 	write(copy_desc, "\n", 1);
@@ -98,6 +111,7 @@ void write_logged_in(int findpc)
 void * thread_login(void *arg)
 {
     int  *findpc = arg;
+    printf("\n pc no is :- %d and Thread ID is :- %u",*findpc,(unsigned int)pthread_self());
     login_users[*findpc].threadId = pthread_self();
     while(1)
     {
@@ -109,22 +123,24 @@ void * thread_login(void *arg)
             double sec = difftime(login_users[*findpc].logout,login_users[*findpc].login);
             double h = (sec/3600); 
             login_users[*findpc].min = (sec -(3600*h))/60;
-            printf("\n mins = %0.2f",login_users[*findpc].min);
+            //printf("\n mins = %0.2f",login_users[*findpc].min);
             double payslip=login_users[*findpc].min*(per_hour_cost/60);
             login_users[*findpc].payment = payslip;
             write_logged_in(*findpc);
             printf("logout succesfull of %s from pc No. %d" ,login_users[*findpc].username ,*findpc);
             login_users[*findpc]=temp;
-            return 0;
+            pthread_exit((void *) findpc);
         }
     }
 }
+
 
 
 int login_newuser()
 {
     char* username = malloc(100);
     printf("\nEnter Username : ");
+    //printf("\nvatsal--------------1\n");
     scanf("%s",username);
     //printf("Logging %s" ,username);
     //finding pc whic is empty
@@ -158,11 +174,12 @@ int login_newuser()
     login_users[findpc].login=time(NULL);
     login_users[findpc].logout=time(NULL);
     login_users[findpc].min=0;
-    
     //creating a thread
+    printf("\n--------------------------------------------------------------%d\n",findpc);
     err = pthread_create (&threadID[findpc], NULL, thread_login, (void *)&findpc);
 	if (err != 0)
 	    printf("cant create thread: %s\n", strerror(err));
+    free(username);
     return 1;
 }
 
@@ -170,6 +187,20 @@ void logout_user()
 {
     int l;
     printf("enter pc no to logout --------------\n");
+    printf("\n----------------------------------------------2\n");
     scanf("%d",&l);
     out[l]=1;
+           // out[l]=2;
+            // printf("\n----------------------------------------------2\n");
+            // total_pc[l].status=0;
+            // login_users[l].logout=time(NULL);
+            // double sec = difftime(login_users[l].logout,login_users[l].login);
+            // double h = (sec/3600); 
+            // login_users[l].min = (sec -(3600*h))/60;
+            // //printf("\n mins = %0.2f",login_users[*findpc].min);
+            // double payslip=login_users[l].min*(per_hour_cost/60);
+            // login_users[l].payment = payslip;
+            // write_logged_in(l);
+            // printf("logout succesfull of %s from pc No. %d" ,login_users[l].username ,l);
+            // login_users[l]=temp;
 }

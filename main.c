@@ -5,9 +5,10 @@
 //     cout << "4: Set Per Hour Cost\n";
 //     cout << "5: Logout All The Users\n";
 //     cout << "6: Get pc Status";
-//     cout << "7: Switch on/off PC";
+//     cout << "7: Calculate Total Income\n"
+//     cout << "8: Switch on/off PC";
 //     cout << "Enter your choice from 1 - 7";
-//     cout << "8: Calculate Total Income\n";
+;
 int main()
 {
     while(1)
@@ -36,11 +37,12 @@ int main()
             case 6:
                 printf("Get Pc status");
                 break;
+            // case 7:
+            //     printf("switch pc ON/OFF");
+            //     break;
             case 7:
-                printf("switch pc ON/OFF");
-                break;
-            case 8:
                 printf("Total Income");
+                break;
             default:
                 break;
 
