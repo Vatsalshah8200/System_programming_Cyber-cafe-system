@@ -1,3 +1,4 @@
+//read and write
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,46 +28,24 @@
 }
 void writehistory()
 {
-	//struct history record;
+	struct history record;
+	strcpy(record.username,"nakul");
+	record.time=5;
+	record.cash=150;
     int fd = open("History.txt", O_WRONLY | O_APPEND);
 	int copy_desc = dup(fd);
 	char tempArr[300];
 	int tempSize;
-	//printf("vatsal ");
-    strcpy(tempArr, "nakul");
-	//tempSize = totalSizeString(tempArr);
-		//tempSize--;
-	// tempArr[tempSize]=',';
-	// tempSize++;
-	// tempArr[tempSize]=' ';
+
+    strcpy(tempArr, record.username);
 	strcat(tempArr, ", ");
-
-// 	char snum[5];
-// // convert 123 to string [buf]
-// 	itoa(history.time, snum, 10);
-
-	strcat(tempArr, "10");
-	tempSize = totalSizeString(tempArr);
-	//tempSize--;
+ 		char snum[5];
+	sprintf(snum, "%0.0f", record.time);
+	strcat(tempArr, snum);
 	strcat(tempArr, ", ");
-
-	printf("%s\n",tempArr);
-	// tempArr[tempSize]=',';
-	// printf("%s\n",tempArr);
-	// tempSize++;
-	// tempArr[tempSize]=' ';
-
-	printf("%s\n",tempArr);
-
-	strcat(tempArr, "150");
-	// tempSize = totalSizeString(tempArr);
-	// tempSize--;
-	// tempArr[tempSize]='';
-	printf("%s\n",tempArr);
-	//nikalo
-	// sprintf(tempAreaCode, "%d", tempNew->areaCode);
-	// strcat(tempArr, tempAreaCode);
-
+		char money[5];
+	sprintf(money, "%d", record.cash);
+	strcat(tempArr, money);
 	write(copy_desc, "\n", 1);
 	write(copy_desc, tempArr, totalSizeString(tempArr));
 }

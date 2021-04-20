@@ -1,3 +1,4 @@
+//thinnking of functionalities and simulation
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
