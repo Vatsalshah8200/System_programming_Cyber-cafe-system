@@ -6,7 +6,6 @@
 //     cout << "5: Logout All The Users\n";
 //     cout << "6: Get pc Status";
 //     cout << "7: Calculate Total Income\n"
-//     cout << "8: Switch on/off PC";
 //     cout << "Enter your choice from 1 - 7";
 ;
 int main()
