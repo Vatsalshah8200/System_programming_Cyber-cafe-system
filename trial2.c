@@ -40,7 +40,9 @@ void * exit_thread(void *arg)
     printf("enter pc no to logout--------------\n");
     scanf("%d",&j);
     out[j-1]=1;
-    printf("thread id %u is exiting 2\n", (unsigned int)pthread_self());
+    
+    unsigned int threadid = (unsigned int)pthread_self();
+    printf("thread id %u is exiting 2\n", threadid);
 }
 
 int main()

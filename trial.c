@@ -34,14 +34,16 @@ struct Date
     int year;
 };
 struct user{
+    
     char* username;
     struct pc pcdet;
     time_t login;
     time_t logout;
     struct Date date; 
     double min;
+    int payment;
 };
-void intial screen()
+void intial_screen()
 {
     cout << "1: NewLogin\n";
     cout << "2: Logout\n";

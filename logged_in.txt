@@ -1,1 +1,3 @@
-threadid, pcno, username, login, logout, date
+pcno, username, date, min, payment
+0, vatsal, 20/4/2021/, 0.00, 0.00
+0, vatsal, 20/4/2021/, 0.00, 0.00
