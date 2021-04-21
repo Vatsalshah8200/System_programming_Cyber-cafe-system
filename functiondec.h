@@ -1,6 +1,9 @@
 #include "config.h"
 
 
+
+
+
 void clean_stdin(void)
 {
     int c;
@@ -10,25 +13,80 @@ void clean_stdin(void)
     } while (c != '\n' && c != EOF);
 }
 
-int intial_screen()
+void getpcstatus()
 {
     for(int i=0;i<10;i++)
     {
-        total_pc[i].pc_no = i;
-        total_pc[i].status = 0;
+        printf("Computer Number :- %d\n",total_pc[i].pc_no);
+        if(total_pc[i].status==0)
+        {
+            printf("Computer is switched OFF\n");
+        }
+        else
+        {
+            printf("Computer is Switched ON\n");
+        }
     }
+}
+
+void changepcstatus()
+{
+    int pcno;
+    char yn;
+    printf("Enter computer Number to check status :-");
+    scanf("%d",&pcno);
+    clean_stdin();
+    printf("\nstatus of This computer Number %d is :-  ",pcno);
+    if(total_pc[pcno].status==0)
+        {
+            printf("switched OFF\n");
+            printf("Would You like to Turn ON (y/n)?");
+            scanf("%c",&yn);
+            if(yn=='y')
+            {
+                total_pc[pcno].status=1;
+                //printf("staus = %d",total_pc[pcno].status);
+                printf("switched ON succesfully");
+            }
+        }
+        else
+        {
+            printf("Switched ON\n");
+            printf("Would You like to Turn OFF (y/n)?");
+            scanf("%c",&yn);
+            if(yn=='y')
+            {
+                total_pc[pcno].status=0;
+                printf("switched OFF succesfully");
+            }
+        }
+}
+
+void setcost()
+{
+    printf("Enter per hour Charge for using Computers :-  ");
+    scanf("%lf",&per_hour_cost);
+    //clean_stdin();
+    printf("Per hour cost for using computers = %0.2f\n",per_hour_cost);
+}
+
+int intial_screen()
+{
+    
     int choice;
     printf("\n");
-    printf("1: NewLogin\n");
-    printf("2: Logout\n");
-    printf("3: Logged IN Users\n");
-    printf("4: Set Per Hour Cost\n");
-    printf("5: Logout All The Users\n");
-    printf("6: Get pc Status\n");
-    printf("7: Switch on/of PC\n");
-    printf("8: calculate Total Income\n");
+    printf("-----------------------------------------------\n");
+    printf("|           1: NewLogin                       |\n");
+    printf("|           2: Logout                         |\n");
+    printf("|           3: Logged IN Users                |\n");
+    printf("|           4: Set Per Hour Cost              |\n");
+    printf("|           5: Logout All The Users           |\n");
+    printf("|           6: Get pc Status                  |\n");
+    printf("|           7: calculate Total Income         |\n");
+    printf("|           8: Switch on/of PC                |\n");
+    printf("-----------------------------------------------\n");
     printf("Enter your choice from 1 - 8 : ");
-
+ 
     scanf("%d",&choice);
     printf("\n");
     clean_stdin();
@@ -39,6 +97,7 @@ int intial_screen()
 void Display_login_user()
 {
     printf("\n");
+    printf("-----------------------------------------------------------\n");
     for(int i=0;i<10;i++)
     {
         if(login_users[i].pcdet.status==1)
@@ -54,6 +113,7 @@ void Display_login_user()
             login_users[i].min = sec / 60;
             printf("Minute passed : %f \n",login_users[i].min);
             double payslip=login_users[i].min*(per_hour_cost/60);
+            printf("Total Payable amount : %f \n",payslip);
             login_users[i].payment = payslip;
             printf("\n");
         }
@@ -128,8 +188,9 @@ void * thread_login(void *arg)
             //printf("\n mins = %0.2f",login_users[*findpc].min);
             double payslip=login_users[findpc].min*(per_hour_cost/60);
             login_users[findpc].payment = payslip;
+            login_users[findpc].status=0;
             write_logged_in(findpc);
-            printf("logout succesfull of %s from pc No. %d" ,login_users[findpc].username ,findpc);
+            printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
             pthread_exit((void *) findpc1);
         }
@@ -159,12 +220,13 @@ int login_newuser()
         return 0;
     }
     
-    printf("Logging %s to Pc no %d" ,username ,findpc);
+    printf("Logging in :-  %s, to Pc No. :- %d\n" ,username ,findpc);
 
     out[findpc] = 0;
     total_pc[findpc].status = 1;
     login_users[findpc].username = malloc(100);
     strcpy(login_users[findpc].username,username);
+    login_users[findpc].status=1;
     login_users[findpc].pcdet = total_pc[findpc];
     printf("Enter Day : ");
     scanf("%d",&login_users[findpc].date.day);
@@ -205,4 +267,15 @@ void logout_user()
             // write_logged_in(l);
             // printf("logout succesfull of %s from pc No. %d" ,login_users[l].username ,l);
             // login_users[l]=temp;
+}
+
+void logoutall()
+{
+    for(int i=0;i<10;i++)
+    {
+        if(login_users[i].status==1)
+        {
+            out[i]=1;
+        }
+    }
 }

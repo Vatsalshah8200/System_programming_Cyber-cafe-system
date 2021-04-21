@@ -30,8 +30,10 @@ struct Date
     int month;
     int year;
 };
+//0 inactive 1 active
 struct user{
     unsigned int threadId;
+    int status;
     char* username;
     struct pc pcdet;
     time_t login;
@@ -53,3 +55,7 @@ void logout_user();
 void write_logged_in();
 int totalSizeString(const char* str);
 void Display_login_user();
+void setcost();
+void getpcstatus();
+void changepcstatus();
+void logoutall();
