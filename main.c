@@ -1,4 +1,5 @@
 #include "functiondec.h"
+
 //   cout << "1: NewLogin\n";
 //     cout << "2: Logout\n";
 //     cout << "3: Logged IN Users\n";
@@ -6,7 +7,8 @@
 //     cout << "5: Logout All The Users\n";
 //     cout << "6: Get pc Status";
 //     cout << "7: Calculate Total Income\n"
-//     cout << "8: Switch on/of PC";
+//     cout << "8: Switch on/off PC";
+//              9: send message to computer
 //     cout << "Enter your choice from 1 - 8";
 ;
 int main()
@@ -15,14 +17,16 @@ int main()
     {
         total_pc[i].pc_no = i;
         total_pc[i].status = 0;
+        pipe(filed[i]);
     }
+
     while(1)
     {
         int choice =  intial_screen();
         switch(choice)
         {
             case 1:
-                printf("logging in new user check available pc and start the pc\n\n");
+                printf("logging in user check available pc and start the pc\n\n");
                 login_newuser();
                 break;
             case 2:
@@ -51,6 +55,10 @@ int main()
             case 8:
                 printf("switch pc ON/OFF\n\n");
                 changepcstatus();
+                break;
+            case 9:
+                printf("Send Message to computers and users\n\n");
+                sendmsg();
                 break;
             default:
                 break;

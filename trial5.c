@@ -58,7 +58,7 @@ char * findstring( char* word)
     }
     int j=i;
     i=0;
-    printf("%s",word);
+    printf("%s \n",word);
     //word="neel";
     for(i=0;i<j;i++)
     {

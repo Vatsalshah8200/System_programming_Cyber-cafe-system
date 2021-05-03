@@ -72,7 +72,7 @@ void setcost()
 
 int intial_screen()
 {
-    
+    printf("\e[1;1H\e[2J");
     int choice;
     printf("\n");
     printf("-----------------------------------------------\n");
@@ -110,7 +110,7 @@ void Display_login_user()
             double sec=difftime(login_users[i].logout,login_users[i].login);
             printf("sec passed : %f \n",sec);
             //double h = (sec/3600); 
-            login_users[i].min = sec / 60;
+            login_users[i].min = sec ;
             printf("Minute passed : %f \n",login_users[i].min);
             double payslip=login_users[i].min*(per_hour_cost/60);
             printf("Total Payable amount : %f \n",payslip);
@@ -120,7 +120,7 @@ void Display_login_user()
     }
 }
 
-int totalSizeString(const char* str)
+int totalSizeString( char* str)
 {
 	char* c = &str[0];
 	int size = 0;
@@ -131,7 +131,221 @@ int totalSizeString(const char* str)
 	}
 	return size;
 }
+// int sendmsg()
+// {
+//     int pcno;
+//     printf("Enter Pc no To which you wana send message");
+//     scanf("%d",&pcno);
+//     if(total_pc[pcno].status==0)
+//     {
+//         printf("%d is switched OFF",pcno);
+//         return 0;
+//     }
 
+//     printf("Enter a Message to send");
+//     scanf("%s",msg);
+
+// }
+
+char * findstring( char* word)
+{
+    FILE *fp = fopen("History.txt", "r");
+	if (fp == NULL)
+	{
+		printf("Unable to open the file\n");
+		return 0;
+	}
+   
+	char line[300];
+    
+    int i=0;
+	while (fgets(line, sizeof(line), fp))
+	{
+		char *token;
+		token = strtok(line, ", ");
+		
+		strcpy(record[i].username, token);
+		//printf("Name : %s\n", record[i].username);
+
+		token = strtok(NULL, ", ");
+        record[i].time = strtod(token,NULL);
+		//printf("time : %0.2f\n", record[i].time);
+
+		token = strtok(NULL, ", ");
+        record[i].cash = strtod(token, NULL);
+		//printf("Payment : %d\n", record[i].cash);
+        i++;
+        printf("\n");
+    }
+    int j=i;
+    i=0;
+    printf("%s \n",word);
+    for(i=0;i<j;i++)
+    {
+        printf("Name : %s\n", record[i].username);
+        if(strcmp(record[i].username,word)==0)
+            break;
+    }
+
+    //i++;
+    char* tempword=malloc(100);
+    strcpy(tempword, record[i].username);
+    strcat(tempword, ", ");
+     
+ 		char snum[5];
+	sprintf(snum, "%0.0f", record[i].time);
+	strcat(tempword, snum);
+	strcat(tempword, ", ");
+		char money[5];
+	sprintf(money, "%0.0f", record[i].cash);
+    
+	strcat(tempword, money);
+    
+    //  printf("%s---------------------------------------------\n",tempword);
+    //  printf("Vatsal  ----------- 6\n");
+     fclose(fp);
+    return tempword;
+
+    
+}
+
+
+char * makestringtoreplace(int findpc)
+{
+    //struct history record[100];
+    double time;
+    double totpayment;
+    char* tempArr;
+    int j=sizeof(record) / sizeof(record[0]);
+    int i;
+    for(i=0;i<j;i++)
+    {
+        // printf("Name : %s\n", record[i].username);
+        if(strcmp(record[i].username,login_users[findpc].username)==0)
+            break;
+    }
+
+    time = record[i].time + login_users[findpc].min;
+    totpayment = record[i].cash + login_users[findpc].payment;
+
+    strcat(tempArr, login_users[findpc].username);
+    strcat(tempArr, ", ");
+    char snum[10];
+    sprintf(snum, "%f", time);
+    strcat(tempArr, snum);
+    strcat(tempArr, ", ");
+    char mnum[10];
+    sprintf(mnum, "%f", totpayment);
+    strcat(tempArr, mnum);
+
+    return tempArr;
+
+}
+
+void replaceAll(char *str, const char *oldWord, const char *newWord)
+{
+    char *pos, temp[BUFFER_SIZE];
+    int index = 0;
+    int owlen;
+
+    owlen = strlen(oldWord);
+
+
+    /*
+     * Repeat till all occurrences are replaced. 
+     */
+    while ((pos = strstr(str, oldWord)) != NULL)
+    {
+        // Bakup current line
+        strcpy(temp, str);
+
+        // Index of current found word
+        index = pos - str;
+
+        // Terminate str after word found index
+        str[index] = '\0';
+
+        // Concatenate str with new word 
+        strcat(str, newWord);
+        
+        // Concatenate str with remaining words after 
+        // oldword found index.
+        strcat(str, temp + index + owlen);
+    }
+}
+
+
+void write_history(int findpc)
+{
+    FILE * fPtr;
+    FILE * fTemp;
+    char path[100];
+    int tempSize;
+    char buffer[BUFFER_SIZE];
+    char* oldWord1;
+    char newWord[100],oldWord[100];
+
+    if(check_username_exsist(login_users[findpc].username)==true)
+    {
+        strcpy(oldWord1, login_users[findpc].username);
+        
+        strcpy(oldWord, findstring(oldWord1));
+
+        strcpy(newWord,makestringtoreplace(findpc));
+        printf("vatasl----------------------------------------------------10"); 
+
+        fPtr  = fopen("History.txt", "r");
+        fTemp = fopen("replace.tmp", "w"); 
+
+        if (fPtr == NULL || fTemp == NULL)
+        {
+            /* Unable to open file hence exit */
+            printf("\nUnable to open file.\n");
+            printf("Please check whether file exists and you have read/write privilege.\n");
+            exit(EXIT_SUCCESS);
+        }
+
+        while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
+    {
+        // Replace all occurrence of word from current line
+        replaceAll(buffer, oldWord, newWord);
+
+        // After replacing write it to temp file.
+        fputs(buffer, fTemp);
+    }
+
+
+    /* Close all files to release resource */
+    fclose(fPtr);
+    fclose(fTemp);
+
+
+    /* Delete original source file */
+    remove("History.txt");
+
+    /* Rename temp file as original file */
+    rename("replace.tmp", "History.txt");
+
+    printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+
+    }
+    //append
+    else
+    {
+    int fd = open("History.txt", O_WRONLY | O_APPEND);
+    int copy_desc = dup(fd);
+	char tempArr[300];
+	int tempSize;
+
+    
+
+    write(copy_desc, "\n", 1);
+	write(copy_desc, tempArr, totalSizeString(tempArr));
+    }
+    
+    
+
+}
 void write_logged_in(int findpc)
 {
     //struct history record;
@@ -155,7 +369,6 @@ void write_logged_in(int findpc)
     strcat(tempArr, "/");
     sprintf(year, "%d", login_users[findpc].date.year);
 	strcat(tempArr, year);
-    strcat(tempArr, "/");
     strcat(tempArr, ", ");
     char snum[10];
     sprintf(snum, "%f", login_users[findpc].min);
@@ -184,12 +397,13 @@ void * thread_login(void *arg)
             login_users[findpc].logout=time(NULL);
             double sec = difftime(login_users[findpc].logout,login_users[findpc].login);
             //double h = (sec/3600); 
-            login_users[findpc].min = sec/60;
+            login_users[findpc].min = sec;
             //printf("\n mins = %0.2f",login_users[*findpc].min);
             double payslip=login_users[findpc].min*(per_hour_cost/60);
             login_users[findpc].payment = payslip;
             login_users[findpc].status=0;
             write_logged_in(findpc);
+            write_history(findpc);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
             pthread_exit((void *) findpc1);
@@ -197,16 +411,60 @@ void * thread_login(void *arg)
     }
 }
 
+bool check_username_exsist(char* username){
+    FILE *fp = fopen("History.txt", "r");
+    if (fp == NULL)
+        {
+            printf("Unable to open the file\n");
+            return 0;
+        }
+    char line[300];
+    struct history record;
+
+    while (fgets(line, sizeof(line), fp))
+	{
+		char *token;
+		token = strtok(line, ", ");
+		strcpy(record.username, token);
+
+		token = strtok(NULL, ", ");
+        record.time = strtod(token,NULL);
+
+		token = strtok(NULL, ", ");
+        record.cash = strtol(token, NULL, 10);
+
+        if(strcmp(record.username,username)==0)
+        {
+            fclose(fp);
+            return true;
+        }
+    }
+    fclose(fp);
+    return false;
+}
 
 
 int login_newuser()
 {
     char* username = malloc(100);
+    char newusr;
+    printf("Is It a New user(y/n)\n");
+    scanf("%c",&newusr);
+
     printf("\nEnter Username : ");
-    //printf("\nvatsal--------------1\n");
     scanf("%s",username);
-    //printf("Logging %s" ,username);
-    //finding pc whic is empty
+    if(newusr=='y')
+    {
+        while(check_username_exsist(username)==true)
+        {
+            free(username);
+            username = malloc(100);
+            printf("\nUsername already exsist\n Enter New Name : - ");
+            scanf("%s",username);
+        }
+    }
+    //finding pc which is empty
+    
     int findpc=0;
     while(out[findpc]!=2)
     {
@@ -250,23 +508,9 @@ int login_newuser()
 void logout_user()
 {
     int l;
-    printf("enter pc no to logout --------------\n");
-    printf("\n----------------------------------------------2\n");
+    printf("enter pc no to logout : -");
     scanf("%d",&l);
     out[l]=1;
-           // out[l]=2;
-            // printf("\n----------------------------------------------2\n");
-            // total_pc[l].status=0;
-            // login_users[l].logout=time(NULL);
-            // double sec = difftime(login_users[l].logout,login_users[l].login);
-            // double h = (sec/3600); 
-            // login_users[l].min = (sec -(3600*h))/60;
-            // //printf("\n mins = %0.2f",login_users[*findpc].min);
-            // double payslip=login_users[l].min*(per_hour_cost/60);
-            // login_users[l].payment = payslip;
-            // write_logged_in(l);
-            // printf("logout succesfull of %s from pc No. %d" ,login_users[l].username ,l);
-            // login_users[l]=temp;
 }
 
 void logoutall()
