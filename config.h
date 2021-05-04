@@ -56,7 +56,7 @@ struct pc total_pc[10];
 struct user login_users[10];
 
 double prepaid;
-struct history record[100];
+// struct history record[100];
 struct user temp;
 pthread_t threadID[10];
 int filed[10][2];

@@ -132,21 +132,7 @@ int totalSizeString( char* str)
 	}
 	return size;
 }
-// int sendmsg()
-// {
-//     int pcno;
-//     printf("Enter Pc no To which you wana send message");
-//     scanf("%d",&pcno);
-//     if(total_pc[pcno].status==0)
-//     {
-//         printf("%d is switched OFF",pcno);
-//         return 0;
-//     }
 
-//     printf("Enter a Message to send");
-//     scanf("%s",msg);
-
-// }
 
 char * findstring( char* word)
 {
@@ -159,6 +145,7 @@ char * findstring( char* word)
    
 	char line[300];
     int i=0;
+    struct history record[100];//////////////////////////////////////////////////////////////
 	while (fgets(line, sizeof(line), fp))
 	{
 		char *token;
@@ -168,7 +155,9 @@ char * findstring( char* word)
 		//printf("Name : %s\n", record[i].username);
 
 		token = strtok(NULL, ", ");
+        //printf("%s",token);
         record[i].time = strtod(token,NULL);
+        //printf("%f",record[i].time);
 		//printf("time : %0.2f\n", record[i].time);
 
 		token = strtok(NULL, ", ");
@@ -218,9 +207,44 @@ char * makestringtoreplace(int findpc)
     double time;
     double totpayment;
     char* tempArr = malloc(100);
-    int j=sizeof(record) / sizeof(record[0]);
-    int i;
     
+    
+    ////remove
+    FILE *fp = fopen("History.txt", "r");
+	if (fp == NULL)
+	{
+		printf("Unable to open the file\n");
+		return 0;
+	}
+   
+	char line[300];
+    int i=0;
+    struct history record[100];//////////////////////////////////////////////////////////////
+	while (fgets(line, sizeof(line), fp))
+	{
+		char *token;
+		token = strtok(line, ", ");
+		
+		strcpy(record[i].username, token);
+		//printf("Name : %s\n", record[i].username);
+
+		token = strtok(NULL, ", ");
+        //printf("%s",token);
+        record[i].time = strtod(token,NULL);
+        //printf("%f",record[i].time);
+		//printf("time : %0.2f\n", record[i].time);
+
+		token = strtok(NULL, ", ");
+        record[i].cash = strtod(token, NULL);
+		//printf("Payment : %d\n", record[i].cash);
+        i++;
+        printf("\n");
+    }
+    ////////////////////////////////////
+
+
+
+    int j=sizeof(record) / sizeof(record[0]);
     for(i=0;i<j;i++)
     {
         // printf("Name : %s\n", record[i].username);
@@ -235,13 +259,13 @@ char * makestringtoreplace(int findpc)
    
     strcat(tempArr, ", ");
     char snum[10];
-    sprintf(snum, "%f", time);
+    sprintf(snum, "%0.0f", time);
     strcat(tempArr, snum);
     strcat(tempArr, ", ");
     char mnum[10];
-    sprintf(mnum, "%f", totpayment);
+    sprintf(mnum, "%0.0f", totpayment);
     strcat(tempArr, mnum);
-    
+    fclose(fp);
     return tempArr;
 
 }
@@ -281,20 +305,22 @@ void replaceAll(char *str, const char *oldWord, const char *newWord)
 
 void write_history(int findpc)
 {
+     printf("First error--------------\n");
     FILE * fPtr;
     FILE * fTemp;
     char path[100];
     int tempSize;
     char buffer[BUFFER_SIZE];
-    char* oldWord1;
+    printf("First error--------------\n");
+    char* oldWord1 = malloc(100);
     char newWord[100],oldWord[100];
-
+    printf("First error--------------\n");
     if(check_username_exsist(login_users[findpc].username)==true)
-    {
+    {   printf("First second error--------------\n");
         strcpy(oldWord1, login_users[findpc].username);
-        
+        printf("second error--------------\n");
         strcpy(oldWord, findstring(oldWord1));
-
+        printf("third error--------------\n");
         strcpy(newWord,makestringtoreplace(findpc));
 
         fPtr  = fopen("History.txt", "r");
@@ -322,14 +348,15 @@ void write_history(int findpc)
     fclose(fPtr);
     fclose(fTemp);
 
-    char path[100] = "History.txt";
+    //char path[100] = "History.txt";
     /* Delete original source file */
-    remove(path);
-
+    int rem = remove("History.txt");
+    printf("%d\n",rem);
     /* Rename temp file as original file */
-    rename("replace.tmp", path);
-
+    int ren = rename("replace.tmp", "History.txt");
+    printf("%d\n",ren);
     printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+    //free(oldWord1);
 
     }
     //append
@@ -343,11 +370,11 @@ void write_history(int findpc)
     strcpy(tempArr, login_users[findpc].username);
     strcat(tempArr, ", ");
     char snum[10];
-    sprintf(snum, "%f", login_users[findpc].min);
+    sprintf(snum, "%0.0f", login_users[findpc].min);
     strcat(tempArr, snum);
     strcat(tempArr, ", ");
     char mnum[10];
-    sprintf(mnum, "%f", login_users[findpc].payment);
+    sprintf(mnum, "%0.0f", login_users[findpc].payment);
     strcat(tempArr, mnum);
 
     printf("%s",tempArr);
@@ -357,7 +384,7 @@ void write_history(int findpc)
     close(fd);
     }
     
-    
+    free(oldWord1);
 
 }
 void write_logged_in(int findpc)
@@ -367,7 +394,7 @@ void write_logged_in(int findpc)
 	int copy_desc = dup(fd);
 	char tempArr[300];
 	int tempSize;
-
+    //printf("loggedin----------------------------------------\n");
     char findpc1[5];
     sprintf(findpc1, "%d", findpc);
     strcpy(tempArr, findpc1);
@@ -391,115 +418,116 @@ void write_logged_in(int findpc)
     char mnum[10];
     sprintf(mnum, "%f", login_users[findpc].payment);
     strcat(tempArr, mnum);
-
+    //printf("loggedin----------------------------------------\n");
 	write(copy_desc, "\n", 1);
 	write(copy_desc, tempArr, totalSizeString(tempArr));
+    close(fd);
+    //printf("loggedin----------------------------------------\n");
 }
 
 
-char * findstringprepaid(char * oldWord1)
-{
-    FILE *fp = fopen("prepaid.txt", "r");
-	if (fp == NULL)
-	{
-		printf("Unable to open the file\n");
-		return 0;
-	}
+// char * findstringprepaid(char * oldWord1)
+// {
+//     FILE *fp = fopen("prepaid.txt", "r");
+// 	if (fp == NULL)
+// 	{
+// 		printf("Unable to open the file\n");
+// 		return 0;
+// 	}
 
-    char line[300];
-    //struct history record[100];
-    int i=0;
-    char* date = malloc(100);
-    char username[20];
-	while (fgets(line, sizeof(line), fp))
-	{
-        char *token;
-		token = strtok(line, ", ");
-        strcpy(date, token);
+//     char line[300];
+//     //struct history record[100];
+//     int i=0;
+//     char* date = malloc(100);
+//     char username[20];
+// 	while (fgets(line, sizeof(line), fp))
+// 	{
+//         char *token;
+// 		token = strtok(line, ", ");
+//         strcpy(date, token);
 
-        token = strtok(NULL, ", ");
-        strcat(date, ", ");
-        strcpy(date, token);
-        strcat(date, ", ");
-        strcpy(username, token);
-        if(strcmp(username,oldWord1)==0)
-        {
-            token = strtok(NULL, ", ");
-            prepaid = strtod(token,NULL);
-            strcpy(date, token);
-            break;
-        }
-    }
-    return date;
-}
+//         token = strtok(NULL, ", ");
+//         strcat(date, ", ");
+//         strcpy(date, token);
+//         strcat(date, ", ");
+//         strcpy(username, token);
+//         if(strcmp(username,oldWord1)==0)
+//         {
+//             token = strtok(NULL, ", ");
+//             prepaid = strtod(token,NULL);
+//             strcpy(date, token);
+//             break;
+//         }
+//     }
+//     return date;
+// }
 
-int check_prepaid_deduct(int findpc)
-{
-    FILE * fPtr;
-    FILE * fTemp;
-    char path[100];
-    int tempSize;
-    char buffer[BUFFER_SIZE];
-    char* oldWord1 = malloc(100);
-    char newWord[100],oldWord[100];
+// int check_prepaid_deduct(int findpc)
+// {
+//     FILE * fPtr;
+//     FILE * fTemp;
+//     int tempSize;
+//     char buffer[BUFFER_SIZE];
+//     char* oldWord1 = malloc(100);
+//     char newWord[100],oldWord[100];
 
-    strcpy(oldWord1, login_users[findpc].username);
+//     strcpy(oldWord1, login_users[findpc].username);
         
-    strcpy(oldWord, findstringprepaid(oldWord1));//make it
+//     strcpy(oldWord, findstringprepaid(oldWord1));//make it
 
-    char day[5],month[5],year[5],pay[10];
-	sprintf(day, "%d", login_users[findpc].date.day);
-	strcat(newWord, day);
-    strcat(newWord, "/");
-    sprintf(month, "%d", login_users[findpc].date.month);
-	strcat(newWord, month);
-    strcat(newWord, "/");
-    sprintf(year, "%d", login_users[findpc].date.year);
-	strcat(newWord, year);
-    strcat(newWord, ", ");
-    strcat(newWord, login_users[findpc].username);
-    strcat(newWord, ", ");
-    double payment = prepaid-login_users[findpc].payment;
-    sprintf(pay, "%f", payment);
-	strcat(newWord, pay);
-
-
-
-        fPtr  = fopen("prepaid.txt", "r");
-        fTemp = fopen("replace1.tmp", "w"); 
-
-        if (fPtr == NULL || fTemp == NULL)
-        {
-            /* Unable to open file hence exit */
-            printf("\nUnable to open file.\n");
-            printf("Please check whether file exists and you have read/write privilege.\n");
-            exit(EXIT_SUCCESS);
-        }
-
-        while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
-        {
-            // Replace all occurrence of word from current line
-            replaceAll(buffer, oldWord, newWord);
-
-            // After replacing write it to temp file.
-            fputs(buffer, fTemp);
-        }
+//     char day[5],month[5],year[5],pay[10];
+// 	sprintf(day, "%d", login_users[findpc].date.day);
+// 	strcat(newWord, day);
+//     strcat(newWord, "/");
+//     sprintf(month, "%d", login_users[findpc].date.month);
+// 	strcat(newWord, month);
+//     strcat(newWord, "/");
+//     sprintf(year, "%d", login_users[findpc].date.year);
+// 	strcat(newWord, year);
+//     strcat(newWord, ", ");
+//     strcat(newWord, login_users[findpc].username);
+//     strcat(newWord, ", ");
+//     double payment = prepaid-login_users[findpc].payment;
+//     sprintf(pay, "%f", payment);
+// 	strcat(newWord, pay);
 
 
-        /* Close all files to release resource */
-        fclose(fPtr);
-        fclose(fTemp);
+
+//         fPtr  = fopen("prepaid.txt", "r");
+//         fTemp = fopen("replace1.tmp", "w"); 
+
+//         if (fPtr == NULL || fTemp == NULL)
+//         {
+//             /* Unable to open file hence exit */
+//             printf("\nUnable to open file.\n");
+//             printf("Please check whether file exists and you have read/write privilege.\n");
+//             exit(EXIT_SUCCESS);
+//         }
+
+//         while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
+//         {
+//             // Replace all occurrence of word from current line
+//             replaceAll(buffer, oldWord, newWord);
+
+//             // After replacing write it to temp file.
+//             fputs(buffer, fTemp);
+//         }
 
 
-        /* Delete original source file */
-        remove("prepaid.txt");
+//         /* Close all files to release resource */
+//         fclose(fPtr);
+//         fclose(fTemp);
 
-        /* Rename temp file as original file */
-        rename("replace1.tmp", "prepaid.txt");
+//     char path[100] = "prepaid.txt";
+//         /* Delete original source file */
+//         remove(path);
 
-        //printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+//         /* Rename temp file as original file */
+//         rename("replace1.tmp", path);
 
-}
+//         printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+
+// }
 
 
 void * thread_login(void *arg)
@@ -523,9 +551,10 @@ void * thread_login(void *arg)
             login_users[findpc].payment = payslip;
             login_users[findpc].status=0;
             write_logged_in(findpc);
+            printf("vatsal------------------------------------------------------------------12345678\n");
             write_history(findpc);
-            printf("vatsal------------------------------------------------------------------123456");
-            check_prepaid_deduct(findpc);
+            printf("vatsal------------------------------------------------------------------123456\n");
+            //check_prepaid_deduct(findpc);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
             pthread_exit((void *) findpc1);
@@ -656,7 +685,7 @@ double searchIncomeByDate(char* date)
         }
 
     }
-    
+    fclose(fp);
     return total;
 }
 
@@ -690,6 +719,7 @@ void postpaidplan()
 
 	write(copy_desc, "\n", 1);
 	write(copy_desc, tempArr, totalSizeString(tempArr));
+    close(fd);
 }
 
 
