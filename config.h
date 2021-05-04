@@ -55,6 +55,7 @@ struct history
 struct pc total_pc[10];
 struct user login_users[10];
 
+double prepaid;
 struct history record[100];
 struct user temp;
 pthread_t threadID[10];
@@ -77,7 +78,7 @@ void postpaidplan();
 bool check_username_exsist(char* username);
 void write_history(int findpc);
 int check_prepaid_deduct(int findpc);
-
+char * findstringprepaid( char* word);
 char * findstring( char* word);
 char * makestringtoreplace(int findpc);
 void replaceAll(char *str, const char *oldWord, const char *newWord);
