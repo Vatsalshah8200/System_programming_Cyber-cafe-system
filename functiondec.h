@@ -426,109 +426,114 @@ void write_logged_in(int findpc)
 }
 
 
-// char * findstringprepaid(char * oldWord1)
-// {
-//     FILE *fp = fopen("prepaid.txt", "r");
-// 	if (fp == NULL)
-// 	{
-// 		printf("Unable to open the file\n");
-// 		return 0;
-// 	}
+char * findstringprepaid(char * oldWord1)
+{
+    FILE *fp = fopen("prepaid.txt", "r");
+	if (fp == NULL)
+	{
+		printf("Unable to open the file\n");
+		return 0;
+	}
 
-//     char line[300];
-//     //struct history record[100];
-//     int i=0;
-//     char* date = malloc(100);
-//     char username[20];
-// 	while (fgets(line, sizeof(line), fp))
-// 	{
-//         char *token;
-// 		token = strtok(line, ", ");
-//         strcpy(date, token);
+    char line[300];
+    //struct history record[100];
+    int i=0;
+    char* date = malloc(100);
+    char username[20];
+	while (fgets(line, sizeof(line), fp))
+	{
+        char *token;
+		token = strtok(line, ", ");
+        strcpy(date, token);
 
-//         token = strtok(NULL, ", ");
-//         strcat(date, ", ");
-//         strcpy(date, token);
-//         strcat(date, ", ");
-//         strcpy(username, token);
-//         if(strcmp(username,oldWord1)==0)
-//         {
-//             token = strtok(NULL, ", ");
-//             prepaid = strtod(token,NULL);
-//             strcpy(date, token);
-//             break;
-//         }
-//     }
-//     return date;
-// }
+        token = strtok(NULL, ", ");
+        strcat(date, ", ");
+        strcpy(date, token);
+        strcat(date, ", ");
+        strcpy(username, token);
+        if(strcmp(username,oldWord1)==0)
+        {
+            token = strtok(NULL, ", ");
+            prepaid = strtod(token,NULL);
+            strcpy(date, token);
+            break;
+        }
+    }
+    fclose(fp);
+    printf("%s\n",date);
+    return date;
+}
 
-// int check_prepaid_deduct(int findpc)
-// {
-//     FILE * fPtr;
-//     FILE * fTemp;
-//     int tempSize;
-//     char buffer[BUFFER_SIZE];
-//     char* oldWord1 = malloc(100);
-//     char newWord[100],oldWord[100];
+int check_prepaid_deduct(int findpc)
+{
+    FILE * fPtr;
+    FILE * fTemp;
+    int tempSize;
+    char buffer[BUFFER_SIZE];
+    char* oldWord1 = malloc(100);
+    char newWord[100],oldWord[100];
+    printf("First prepaid error\n");
+    strcpy(oldWord1, login_users[findpc].username);
+        printf("second prepaid error\n");
+    strcpy(oldWord, findstringprepaid(oldWord1));//make it
 
-//     strcpy(oldWord1, login_users[findpc].username);
-        
-//     strcpy(oldWord, findstringprepaid(oldWord1));//make it
+    char day[5],month[5],year[5],pay[10];
+	sprintf(day, "%d", login_users[findpc].date.day);
+	strcat(newWord, day);
+    strcat(newWord, "/");
+    sprintf(month, "%d", login_users[findpc].date.month);
+	strcat(newWord, month);
+    strcat(newWord, "/");
+    sprintf(year, "%d", login_users[findpc].date.year);
+	strcat(newWord, year);
+    strcat(newWord, ", ");
+    strcat(newWord, login_users[findpc].username);
+    strcat(newWord, ", ");
+    double payment = prepaid-login_users[findpc].payment;
+    sprintf(pay, "%f", payment);
+	strcat(newWord, pay);
 
-//     char day[5],month[5],year[5],pay[10];
-// 	sprintf(day, "%d", login_users[findpc].date.day);
-// 	strcat(newWord, day);
-//     strcat(newWord, "/");
-//     sprintf(month, "%d", login_users[findpc].date.month);
-// 	strcat(newWord, month);
-//     strcat(newWord, "/");
-//     sprintf(year, "%d", login_users[findpc].date.year);
-// 	strcat(newWord, year);
-//     strcat(newWord, ", ");
-//     strcat(newWord, login_users[findpc].username);
-//     strcat(newWord, ", ");
-//     double payment = prepaid-login_users[findpc].payment;
-//     sprintf(pay, "%f", payment);
-// 	strcat(newWord, pay);
+printf("third prepaid error\n");
 
+        fPtr  = fopen("prepaid.txt", "r");
+        fTemp = fopen("replace1.tmp", "w"); 
+   
+        if (fPtr == NULL || fTemp == NULL)
+        {
+            /* Unable to open file hence exit */
+            printf("\nUnable to open file.\n");
+            printf("Please check whether file exists and you have read/write privilege.\n");
+            exit(EXIT_SUCCESS);
+        }
+ printf("fourth prepaid error\n");
+        while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
+        {
+            // Replace all occurrence of word from current line
+            replaceAll(buffer, oldWord, newWord);
 
+            // After replacing write it to temp file.
+            fputs(buffer, fTemp);
+        }
+    
+     printf("fifth prepaid error\n");
+        /* Close all files to release resource */
+        fclose(fPtr);
+        fclose(fTemp);
 
-//         fPtr  = fopen("prepaid.txt", "r");
-//         fTemp = fopen("replace1.tmp", "w"); 
+    // char path[100] = "prepaid.txt";
+        /* Delete original source file */
+        int trm = remove("prepaid.txt");
+        printf("%d\n",trm);
+         printf("sixth prepaid error\n");
+        /* Rename temp file as original file */
+        int trma = rename("replace1.tmp", "prepaid.txt");
+        printf("%d\n",trma);
+     printf("seventh prepaid error\n");
+        printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+        free(oldWord1);
 
-//         if (fPtr == NULL || fTemp == NULL)
-//         {
-//             /* Unable to open file hence exit */
-//             printf("\nUnable to open file.\n");
-//             printf("Please check whether file exists and you have read/write privilege.\n");
-//             exit(EXIT_SUCCESS);
-//         }
-
-//         while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
-//         {
-//             // Replace all occurrence of word from current line
-//             replaceAll(buffer, oldWord, newWord);
-
-//             // After replacing write it to temp file.
-//             fputs(buffer, fTemp);
-//         }
-
-
-//         /* Close all files to release resource */
-//         fclose(fPtr);
-//         fclose(fTemp);
-
-//     char path[100] = "prepaid.txt";
-//         /* Delete original source file */
-//         remove(path);
-
-//         /* Rename temp file as original file */
-//         rename("replace1.tmp", path);
-
-//         printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
-
-// }
-
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void * thread_login(void *arg)
 {
@@ -554,7 +559,7 @@ void * thread_login(void *arg)
             printf("vatsal------------------------------------------------------------------12345678\n");
             write_history(findpc);
             printf("vatsal------------------------------------------------------------------123456\n");
-            //check_prepaid_deduct(findpc);
+            check_prepaid_deduct(findpc);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
             pthread_exit((void *) findpc1);
