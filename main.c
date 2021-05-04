@@ -51,14 +51,17 @@ int main()
                 break;
             case 7:
                 printf("Total Income\n\n");
+                getincome();
                 break;
             case 8:
                 printf("switch pc ON/OFF\n\n");
                 changepcstatus();
                 break;
             case 9:
-                printf("Send Message to computers and users\n\n");
-                sendmsg();
+                printf("Add balance to account\n\n");
+                postpaidplan();
+                // printf("Send Message to computers and users\n\n");
+                // sendmsg();
                 break;
             default:
                 break;

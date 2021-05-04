@@ -84,6 +84,7 @@ int intial_screen()
     printf("|           6: Get pc Status                  |\n");
     printf("|           7: calculate Total Income         |\n");
     printf("|           8: Switch on/of PC                |\n");
+    printf("|           9: Recharge prepaid               |\n");
     printf("-----------------------------------------------\n");
     printf("Enter your choice from 1 - 8 : ");
  
@@ -337,10 +338,21 @@ void write_history(int findpc)
 	char tempArr[300];
 	int tempSize;
 
-    
+    strcpy(tempArr, login_users[findpc].username);
+    strcat(tempArr, ", ");
+    char snum[10];
+    sprintf(snum, "%f", login_users[findpc].min);
+    strcat(tempArr, snum);
+    strcat(tempArr, ", ");
+    char mnum[10];
+    sprintf(mnum, "%f", login_users[findpc].payment);
+    strcat(tempArr, mnum);
+
+    printf("%s",tempArr);
 
     write(copy_desc, "\n", 1);
 	write(copy_desc, tempArr, totalSizeString(tempArr));
+    close(fd);
     }
     
     
@@ -382,6 +394,41 @@ void write_logged_in(int findpc)
 	write(copy_desc, tempArr, totalSizeString(tempArr));
 }
 
+int check_prepaid_deduct(int findpc)
+{
+    FILE *fp = fopen("prepaid.txt", "a+");
+	if (fp == NULL)
+	{
+		printf("Unable to open the file\n");
+		return 0;
+	}
+   
+	char line[300];
+    
+    int i=0;
+    double newbal;
+    char* date;
+    char* uname;
+	while (fgets(line, sizeof(line), fp))
+	{
+        char *token;
+		token = strtok(line, ", ");
+        strcpy(date, token);
+        token = strtok(NULL, ", ");
+        strcpy(uname, token);
+       if(strcmp(login_users[findpc].username,uname)==0)
+        {
+            token = strtok(NULL, ", ");
+            newbal = strtod(token,NULL) - login_users[findpc].payment;
+            char mnum[10];
+            sprintf(mnum, "%f", newbal);
+            fprintf(fp, "%s, %s, %s", date,uname,mnum );
+        }
+    }
+
+}
+
+
 void * thread_login(void *arg)
 {
     struct  user *findpc1 = arg;
@@ -404,6 +451,7 @@ void * thread_login(void *arg)
             login_users[findpc].status=0;
             write_logged_in(findpc);
             write_history(findpc);
+            check_prepaid_deduct(findpc);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
             pthread_exit((void *) findpc1);
@@ -504,6 +552,130 @@ int login_newuser()
     free(username);
     return 1;
 }
+
+double searchIncomeByDate(char* date)
+{
+    FILE *fp = fopen("logged_in.txt", "r");
+    if (fp == NULL)
+	{
+		printf("Unable to open the file\n");
+		return 0;
+	}
+    char line[300];
+    double total;
+    char newdate[20];
+    while (fgets(line, sizeof(line), fp))
+	{
+	    char *token;
+		token = strtok(line, ", ");
+        //pcno
+        token = strtok(NULL, ", ");
+        //name
+        token = strtok(NULL, ", ");
+        strcpy(newdate, token);
+        if(strcmp(newdate,date)==0)
+        {
+            token = strtok(NULL, ", ");
+            //min
+            token = strtok(NULL, ", ");
+            total = total + strtod(token,NULL);
+        }
+
+    }
+    
+    return total;
+}
+
+void postpaidplan()
+{
+    int fd = open("prepaid.txt", O_WRONLY | O_APPEND);
+	int copy_desc = dup(fd);
+	char tempArr[300];
+	int tempSize;
+
+
+    char day[5],month[5],year[5];
+    scanf("%s",day);
+	strcat(tempArr, day);
+    strcat(tempArr, "/");
+    scanf("%s",month);
+	strcat(tempArr, month);
+    strcat(tempArr, "/");
+    scanf("%s",year);
+	strcat(tempArr, year);
+    strcat(tempArr, ", ");
+
+    char username[100];
+    scanf("%s",username);
+    strcpy(tempArr,username);
+    strcat(tempArr, ", ");
+    
+    char mnum[10];
+    scanf("%s",mnum);
+    strcat(tempArr, mnum);
+
+	write(copy_desc, "\n", 1);
+	write(copy_desc, tempArr, totalSizeString(tempArr));
+}
+
+
+double searchIncomeByUname(char* uname)
+{
+    FILE *fp = fopen("History.txt", "r");
+    if (fp == NULL)
+	{
+		printf("Unable to open the file\n");
+		return 0;
+	}
+    char line[300];
+    double total;
+    char name[20];
+    while (fgets(line, sizeof(line), fp))
+	{
+        char *token;
+		token = strtok(line, ", ");
+        strcpy(name, token);
+        if(strcmp(name,uname)==0)
+        {
+            token = strtok(NULL, ", ");
+            //time
+            token = strtok(NULL, ", ");
+            total = strtod(token,NULL);
+            break;
+        }
+
+    }
+    return total;
+}
+
+void getincome()
+{
+    char ch;
+    printf("d :- for date wise income  and \nu :- for user wise income\n");
+    scanf("%c",&ch);
+    if(ch=='d')
+    {
+        char date[100];
+        double in;
+        printf("Enter date to calculate income : - ");
+        scanf("%s",date);
+        in =  searchIncomeByDate(date);
+        printf("Total income on %s is %f",date ,in);
+
+    }
+    else if(ch=='u')
+    {
+        char uname[100];
+        double in;
+        printf("Enter username to calculate income : - ");
+        scanf("%s",uname);
+        in =  searchIncomeByUname(uname);
+        printf("Total income From User %s is %f",uname ,in);
+
+    }
+}
+
+
 
 void logout_user()
 {

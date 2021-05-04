@@ -2,3 +2,4 @@ username, time, cost
 vatsal, 10, 5
 akki, 20, 10
 neel, 50, 25
+nakul, 50.000000, 25.000000

@@ -72,10 +72,17 @@ void setcost();
 void getpcstatus();
 void changepcstatus();
 void logoutall();
-int sendmsg();
+// int sendmsg();
+void postpaidplan();
 bool check_username_exsist(char* username);
 void write_history(int findpc);
+int check_prepaid_deduct(int findpc);
 
 char * findstring( char* word);
 char * makestringtoreplace(int findpc);
 void replaceAll(char *str, const char *oldWord, const char *newWord);
+
+double searchIncomeByUname(char* uname);
+double searchIncomeByDate(char* date);
+void getincome();
+
