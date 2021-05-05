@@ -16,6 +16,7 @@
 #define READ 0    /* The index of the “read” end of the pipe */
 #define WRITE 1 /* The index of the “write” end of the pipe */
 #define BUFFER_SIZE 1000
+pthread_mutex_t mutexthread;
 //0-login,1-logout,2-not in use
 int out[10]={2,2,2,2,2,2,2,2,2,2};
 double per_hour_cost = 0;
@@ -74,7 +75,7 @@ void getpcstatus();
 void changepcstatus();
 void logoutall();
 // int sendmsg();
-void postpaidplan();
+void prepaidplan();
 bool check_username_exsist(char* username);
 void write_history(int findpc);
 int check_prepaid_deduct(int findpc);

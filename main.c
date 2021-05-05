@@ -10,9 +10,10 @@
 //     cout << "8: Switch on/off PC";
 //              9: send message to computer
 //     cout << "Enter your choice from 1 - 8";
-;
+
 int main()
 {
+    pthread_mutex_init(&mutexthread,NULL);
     for(int i=0;i<10;i++)
     {
         total_pc[i].pc_no = i;
@@ -59,7 +60,7 @@ int main()
                 break;
             case 9:
                 printf("Add balance to account\n\n");
-                postpaidplan();
+                prepaidplan();
                 // printf("Send Message to computers and users\n\n");
                 // sendmsg();
                 break;
@@ -68,5 +69,6 @@ int main()
 
         }
     }
+    pthread_mutex_destroy(&mutexthread);
     return 0;
 }

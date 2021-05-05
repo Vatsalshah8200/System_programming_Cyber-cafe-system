@@ -1,9 +1,6 @@
 #include "config.h"
 
 
-
-
-
 void clean_stdin(void)
 {
     int c;
@@ -45,7 +42,7 @@ void changepcstatus()
             if(yn=='y')
             {
                 total_pc[pcno].status=1;
-                //printf("staus = %d",total_pc[pcno].status);
+                
                 printf("switched ON succesfully");
             }
         }
@@ -66,7 +63,7 @@ void setcost()
 {
     printf("Enter per hour Charge for using Computers :-  ");
     scanf("%lf",&per_hour_cost);
-    //clean_stdin();
+    
     printf("Per hour cost for using computers = %0.2f\n",per_hour_cost);
 }
 
@@ -86,7 +83,7 @@ int intial_screen()
     printf("|           8: Switch on/of PC                |\n");
     printf("|           9: Recharge prepaid               |\n");
     printf("-----------------------------------------------\n");
-    printf("Enter your choice from 1 - 8 : ");
+    printf("Enter your choice from 1 - 9 : ");
  
     scanf("%d",&choice);
     printf("\n");
@@ -389,12 +386,12 @@ void write_history(int findpc)
 }
 void write_logged_in(int findpc)
 {
-    //struct history record;
+    
     int fd = open("logged_in.txt", O_WRONLY | O_APPEND);
 	int copy_desc = dup(fd);
 	char tempArr[300];
 	int tempSize;
-    //printf("loggedin----------------------------------------\n");
+    
     char findpc1[5];
     sprintf(findpc1, "%d", findpc);
     strcpy(tempArr, findpc1);
@@ -418,11 +415,11 @@ void write_logged_in(int findpc)
     char mnum[10];
     sprintf(mnum, "%f", login_users[findpc].payment);
     strcat(tempArr, mnum);
-    //printf("loggedin----------------------------------------\n");
+    
 	write(copy_desc, "\n", 1);
 	write(copy_desc, tempArr, totalSizeString(tempArr));
     close(fd);
-    //printf("loggedin----------------------------------------\n");
+    
 }
 
 
@@ -460,7 +457,6 @@ char * findstringprepaid(char * oldWord1)
         }
     }
     fclose(fp);
-    printf("%s\n",date);
     return date;
 }
 
@@ -472,9 +468,9 @@ int check_prepaid_deduct(int findpc)
     char buffer[BUFFER_SIZE];
     char* oldWord1 = malloc(100);
     char newWord[100],oldWord[100];
-    printf("First prepaid error\n");
+    
     strcpy(oldWord1, login_users[findpc].username);
-        printf("second prepaid error\n");
+        
     strcpy(oldWord, findstringprepaid(oldWord1));//make it
 
     char day[5],month[5],year[5],pay[10];
@@ -493,7 +489,7 @@ int check_prepaid_deduct(int findpc)
     sprintf(pay, "%f", payment);
 	strcat(newWord, pay);
 
-printf("third prepaid error\n");
+
 
         fPtr  = fopen("prepaid.txt", "r");
         fTemp = fopen("replace1.tmp", "w"); 
@@ -505,7 +501,7 @@ printf("third prepaid error\n");
             printf("Please check whether file exists and you have read/write privilege.\n");
             exit(EXIT_SUCCESS);
         }
- printf("fourth prepaid error\n");
+
         while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
         {
             // Replace all occurrence of word from current line
@@ -545,6 +541,7 @@ void * thread_login(void *arg)
     {
         if(out[login_users[findpc].pcdet.pc_no]==1)
         {
+            sleep(1);
             out[findpc]=2;
             total_pc[findpc].status=0;
             login_users[findpc].logout=time(NULL);
@@ -555,16 +552,19 @@ void * thread_login(void *arg)
             double payslip=login_users[findpc].min*(per_hour_cost/60);
             login_users[findpc].payment = payslip;
             login_users[findpc].status=0;
+            pthread_mutex_lock(&mutexthread);
             write_logged_in(findpc);
             printf("vatsal------------------------------------------------------------------12345678\n");
             write_history(findpc);
             printf("vatsal------------------------------------------------------------------123456\n");
             check_prepaid_deduct(findpc);
+            pthread_mutex_unlock(&mutexthread);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
-            pthread_exit((void *) findpc1);
+            break;
         }
     }
+        pthread_exit((void *) findpc1);
 }
 
 bool check_username_exsist(char* username){
@@ -694,7 +694,7 @@ double searchIncomeByDate(char* date)
     return total;
 }
 
-void postpaidplan()
+void prepaidplan()
 {
     int fd = open("prepaid.txt", O_WRONLY | O_APPEND);
 	int copy_desc = dup(fd);

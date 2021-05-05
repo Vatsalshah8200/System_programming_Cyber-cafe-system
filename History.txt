@@ -1,7 +1,8 @@
 username, time, cost
-vatsal, 280, 141
+vatsal, 335, 168
 akki, 79, 40
 neel, 139, 70
 nakul, 65, 32
 kki, 19, 9
 eel, 11, 5
+annu, 87, 44
