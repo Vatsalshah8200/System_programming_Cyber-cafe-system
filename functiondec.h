@@ -693,38 +693,107 @@ double searchIncomeByDate(char* date)
     fclose(fp);
     return total;
 }
+bool prepaiduserexsist(char* username)
+{
+    FILE *fp = fopen("prepaid.txt", "r");
+    if (fp == NULL)
+        {
+            printf("Unable to open the file\n");
+            return 0;
+        }
+    char line[300];
+    char uname[20];
+
+    while (fgets(line, sizeof(line), fp))
+	{
+		char *token;
+		token = strtok(line, ", ");
+
+		token = strtok(NULL, ", ");
+        strcpy(uname,token);
+
+        if(strcmp(uname,username)==0)
+        {
+            fclose(fp);
+            return true;
+        }
+    }
+    fclose(fp);
+    return false;
+}
+
+// void upgradePlanBalance()
+// {
+//     FILE * fPtr;
+//     FILE * fTemp;
+//     char path[100];
+//     int tempSize;
+//     char buffer[BUFFER_SIZE];
+//     // char* oldWord1;
+//     char newWord[100],oldWord[100];
+
+//         char username[100];
+//         printf("Enter Username: - ");
+//         scanf("%s",username);
+//         strcpy(oldWord,username);
+//         strcat(oldWord, ", ");
+//         FILE *fp = fopen("prepaid.txt", "r");
+//         char line[300];
+//         char uname[20];
+//         while (fgets(line, sizeof(line), fp))
+// 	    {
+//             char *token;
+// 		    token = strtok(line, ", ");
+//             token = strtok(NULL, ", ");
+
+// }
+
 
 void prepaidplan()
 {
-    int fd = open("prepaid.txt", O_WRONLY | O_APPEND);
-	int copy_desc = dup(fd);
-	char tempArr[300];
-	int tempSize;
+        char username[100];
+        printf("Enter Username: - ");
+        scanf("%s",username);
+    if( prepaiduserexsist(username) == false)
+    {
+        int fd = open("prepaid.txt", O_WRONLY | O_APPEND);
+        int copy_desc = dup(fd);
+        char tempArr[300];
+        int tempSize;
 
 
-    char day[5],month[5],year[5];
-    scanf("%s",day);
-	strcat(tempArr, day);
-    strcat(tempArr, "/");
-    scanf("%s",month);
-	strcat(tempArr, month);
-    strcat(tempArr, "/");
-    scanf("%s",year);
-	strcat(tempArr, year);
-    strcat(tempArr, ", ");
+        char day[5],month[5],year[5];
+        printf("Enter Day: - ");
+        scanf("%s",day);
+        strcpy(tempArr, day);
+        strcat(tempArr, "/");
+        
+        printf("Enter Month: - ");
+        scanf("%s",month);
+        strcat(tempArr, month);
+        strcat(tempArr, "/");
+        printf("Enter Year: - ");
+        scanf("%s",year);
+        strcat(tempArr, year);
+        strcat(tempArr, ", ");
 
-    char username[100];
-    scanf("%s",username);
-    strcpy(tempArr,username);
-    strcat(tempArr, ", ");
-    
-    char mnum[10];
-    scanf("%s",mnum);
-    strcat(tempArr, mnum);
-
-	write(copy_desc, "\n", 1);
-	write(copy_desc, tempArr, totalSizeString(tempArr));
-    close(fd);
+        
+        strcat(tempArr,username);
+        strcat(tempArr, ", ");
+        
+        char mnum[10];
+        printf("Enter Balance: - ");
+        scanf("%s",mnum);
+        strcat(tempArr, mnum);
+        write(copy_desc, "\n", 1);
+        write(copy_desc, tempArr, totalSizeString(tempArr));
+        close(fd);
+    }
+    else
+    {
+        printf("Username exsist");
+        upgradePlanBalance();
+    }
 }
 
 

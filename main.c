@@ -59,7 +59,7 @@ int main()
                 changepcstatus();
                 break;
             case 9:
-                printf("Add balance to account\n\n");
+                printf("Enter Details to add balance to account\n\n");
                 prepaidplan();
                 // printf("Send Message to computers and users\n\n");
                 // sendmsg();

@@ -76,6 +76,9 @@ void changepcstatus();
 void logoutall();
 // int sendmsg();
 void prepaidplan();
+bool prepaiduserexsist(char* username);
+void upgradePlanBalance();
+
 bool check_username_exsist(char* username);
 void write_history(int findpc);
 int check_prepaid_deduct(int findpc);
