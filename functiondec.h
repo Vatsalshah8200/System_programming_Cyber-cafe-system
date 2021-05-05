@@ -302,22 +302,22 @@ void replaceAll(char *str, const char *oldWord, const char *newWord)
 
 void write_history(int findpc)
 {
-     printf("First error--------------\n");
+     
     FILE * fPtr;
     FILE * fTemp;
     char path[100];
     int tempSize;
     char buffer[BUFFER_SIZE];
-    printf("First error--------------\n");
+    
     char* oldWord1 = malloc(100);
     char newWord[100],oldWord[100];
-    printf("First error--------------\n");
+    
     if(check_username_exsist(login_users[findpc].username)==true)
-    {   printf("First second error--------------\n");
+    {   
         strcpy(oldWord1, login_users[findpc].username);
-        printf("second error--------------\n");
+        
         strcpy(oldWord, findstring(oldWord1));
-        printf("third error--------------\n");
+        
         strcpy(newWord,makestringtoreplace(findpc));
 
         fPtr  = fopen("History.txt", "r");
@@ -332,28 +332,28 @@ void write_history(int findpc)
         }
 
         while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
-    {
-        // Replace all occurrence of word from current line
-        replaceAll(buffer, oldWord, newWord);
+        {
+            // Replace all occurrence of word from current line
+            replaceAll(buffer, oldWord, newWord);
 
-        // After replacing write it to temp file.
-        fputs(buffer, fTemp);
-    }
+            // After replacing write it to temp file.
+            fputs(buffer, fTemp);
+        }
 
 
-    /* Close all files to release resource */
-    fclose(fPtr);
-    fclose(fTemp);
+        /* Close all files to release resource */
+        fclose(fPtr);
+        fclose(fTemp);
 
-    //char path[100] = "History.txt";
-    /* Delete original source file */
-    int rem = remove("History.txt");
-    printf("%d\n",rem);
-    /* Rename temp file as original file */
-    int ren = rename("replace.tmp", "History.txt");
-    printf("%d\n",ren);
-    printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
-    //free(oldWord1);
+        //char path[100] = "History.txt";
+        /* Delete original source file */
+        int rem = remove("History.txt");
+        printf("%d\n",rem);
+        /* Rename temp file as original file */
+        int ren = rename("replace.tmp", "History.txt");
+        printf("%d\n",ren);
+        printf("\n history  Successfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+        //free(oldWord1);
 
     }
     //append
@@ -441,18 +441,18 @@ char * findstringprepaid(char * oldWord1)
 	{
         char *token;
 		token = strtok(line, ", ");
-        strcpy(date, token);
 
         token = strtok(NULL, ", ");
-        strcat(date, ", ");
         strcpy(date, token);
-        strcat(date, ", ");
-        strcpy(username, token);
-        if(strcmp(username,oldWord1)==0)
+        
+        if(strcmp(date,oldWord1)==0)
         {
+            strcat(date, ", ");
             token = strtok(NULL, ", ");
             prepaid = strtod(token,NULL);
-            strcpy(date, token);
+            strcat(date, token);
+
+            printf("old string = %s\n",date);
             break;
         }
     }
@@ -473,20 +473,12 @@ int check_prepaid_deduct(int findpc)
         
     strcpy(oldWord, findstringprepaid(oldWord1));//make it
 
-    char day[5],month[5],year[5],pay[10];
-	sprintf(day, "%d", login_users[findpc].date.day);
-	strcat(newWord, day);
-    strcat(newWord, "/");
-    sprintf(month, "%d", login_users[findpc].date.month);
-	strcat(newWord, month);
-    strcat(newWord, "/");
-    sprintf(year, "%d", login_users[findpc].date.year);
-	strcat(newWord, year);
+    char pay[10];
+	
+    strcpy(newWord, login_users[findpc].username);
     strcat(newWord, ", ");
-    strcat(newWord, login_users[findpc].username);
-    strcat(newWord, ", ");
-    double payment = prepaid-login_users[findpc].payment;
-    sprintf(pay, "%f", payment);
+    double payment = prepaid - login_users[findpc].payment;
+    sprintf(pay, "%0.0f", payment);
 	strcat(newWord, pay);
 
 
@@ -525,10 +517,38 @@ int check_prepaid_deduct(int findpc)
         int trma = rename("replace1.tmp", "prepaid.txt");
         printf("%d\n",trma);
      printf("seventh prepaid error\n");
-        printf("\nSuccessfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+        printf("\nprepaid Successfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
         free(oldWord1);
 
 }
+bool prepaiduser(char* username)
+{
+    FILE *fp = fopen("prepaid.txt", "r");
+    if (fp == NULL)
+        {
+            printf("Unable to open the file\n");
+            return 0;
+        }
+    char line[300],uname[20];
+
+    while (fgets(line, sizeof(line), fp))
+	{
+		char *token;
+		token = strtok(line, ", ");
+		
+
+		token = strtok(NULL, ", ");
+        strcpy(uname,token);
+        if(strcmp(uname,username)==0)
+        {
+            fclose(fp);
+            return true;
+        }
+    }
+    fclose(fp);
+    return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void * thread_login(void *arg)
@@ -557,7 +577,8 @@ void * thread_login(void *arg)
             printf("vatsal------------------------------------------------------------------12345678\n");
             write_history(findpc);
             printf("vatsal------------------------------------------------------------------123456\n");
-            check_prepaid_deduct(findpc);
+            if(prepaiduser(login_users[findpc].username)==true)
+                check_prepaid_deduct(findpc);
             pthread_mutex_unlock(&mutexthread);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;

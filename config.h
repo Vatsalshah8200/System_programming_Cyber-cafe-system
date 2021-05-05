@@ -78,6 +78,8 @@ void logoutall();
 void prepaidplan();
 bool prepaiduserexsist(char* username);
 
+bool prepaiduser(char* username);
+
 
 bool check_username_exsist(char* username);
 void write_history(int findpc);
