@@ -167,7 +167,7 @@ char * findstring( char* word)
     
     int j=sizeof(record) / sizeof(record[0]);
     i=0;
-    printf("%s \n",word);
+    //printf("%s \n",word);
     for(i=0;i<j;i++)
     {
         if(strcmp(record[i].username,word)==0)
@@ -371,7 +371,6 @@ void write_history(int findpc)
     sprintf(mnum, "%0.0f", login_users[findpc].payment);
     strcat(tempArr, mnum);
 
-    printf("%s",tempArr);
 
     write(copy_desc, "\n", 1);
 	write(copy_desc, tempArr, totalSizeString(tempArr));
@@ -476,6 +475,7 @@ int check_prepaid_deduct(int findpc)
     double payment = prepaid - login_users[findpc].payment;
     sprintf(pay, "%0.0f", payment);
 	strcat(newWord, pay);
+    strcat(newWord, "\n");
 
 
 
@@ -800,16 +800,17 @@ void prepaidplan()
         scanf("%s",username);
     if( prepaiduserexsist(username) == false)
     {
-        int fd = open("prepaid.txt", O_WRONLY | O_APPEND);
-        int copy_desc = dup(fd);
+        //int fd = open("prepaid.txt", O_WRONLY | O_APPEND);
+        FILE *fp = fopen("prepaid.txt", "a");
+        //int copy_desc = dup(fd);
         char tempArr[300];
         int tempSize;
 
-
+    strcpy(tempArr,"\n");
         char day[5],month[5],year[5];
         printf("Enter Day: - ");
         scanf("%s",day);
-        strcpy(tempArr, day);
+        strcat(tempArr, day);
         strcat(tempArr, "/");
         
         printf("Enter Month: - ");
@@ -829,9 +830,12 @@ void prepaidplan()
         printf("Enter Balance: - ");
         scanf("%s",mnum);
         strcat(tempArr, mnum);
-        write(copy_desc, "\n", 1);
-        write(copy_desc, tempArr, totalSizeString(tempArr));
-        close(fd);
+
+        fputs(tempArr,fp);
+        fclose(fp);
+        // write(copy_desc, "\n", 1);
+        // write(copy_desc, tempArr, totalSizeString(tempArr));
+        //close(fd);
     }
     else
     {
