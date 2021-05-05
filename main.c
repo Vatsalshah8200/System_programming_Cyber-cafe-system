@@ -13,7 +13,8 @@
 
 int main()
 {
-    pthread_mutex_init(&mutexthread,NULL);
+    ///////////pthread_mutex_init(&mutexthread,NULL);
+    pthread_rwlock_init(&rw_lock, NULL);
     for(int i=0;i<10;i++)
     {
         total_pc[i].pc_no = i;
@@ -69,6 +70,7 @@ int main()
 
         }
     }
-    pthread_mutex_destroy(&mutexthread);
+    pthread_rwlock_destroy(&rw_lock);
+    ////////////pthread_mutex_destroy(&mutexthread);
     return 0;
 }

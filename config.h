@@ -16,7 +16,9 @@
 #define READ 0    /* The index of the “read” end of the pipe */
 #define WRITE 1 /* The index of the “write” end of the pipe */
 #define BUFFER_SIZE 1000
-pthread_mutex_t mutexthread;
+///////////////////////////////pthread_mutex_t mutexthread;
+
+pthread_rwlock_t rw_lock;
 //0-login,1-logout,2-not in use
 int out[10]={2,2,2,2,2,2,2,2,2,2};
 double per_hour_cost = 0;

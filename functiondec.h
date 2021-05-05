@@ -70,6 +70,7 @@ void setcost()
 int intial_screen()
 {
     printf("\e[1;1H\e[2J");
+    sleep(4);
     int choice;
     printf("\n");
     printf("-----------------------------------------------\n");
@@ -149,17 +150,16 @@ char * findstring( char* word)
 		token = strtok(line, ", ");
 		
 		strcpy(record[i].username, token);
-		//printf("Name : %s\n", record[i].username);
+		
 
 		token = strtok(NULL, ", ");
-        //printf("%s",token);
+        
         record[i].time = strtod(token,NULL);
-        //printf("%f",record[i].time);
-		//printf("time : %0.2f\n", record[i].time);
+        
 
 		token = strtok(NULL, ", ");
         record[i].cash = strtod(token, NULL);
-		//printf("Payment : %d\n", record[i].cash);
+
         i++;
         printf("\n");
     }
@@ -170,12 +170,11 @@ char * findstring( char* word)
     printf("%s \n",word);
     for(i=0;i<j;i++)
     {
-        printf("Name : %s\n", record[i].username);
         if(strcmp(record[i].username,word)==0)
             break;
     }
     
-    //i++;
+    
     char* tempword=malloc(100);
     strcpy(tempword, record[i].username);
     strcat(tempword, ", ");
@@ -189,8 +188,7 @@ char * findstring( char* word)
     
 	strcat(tempword, money);
     
-      //printf("%s---------------------------------------------\n",tempword);
-    //  printf("Vatsal  ----------- 6\n");
+      
     fclose(fp);
     return tempword;
 
@@ -200,7 +198,7 @@ char * findstring( char* word)
 
 char * makestringtoreplace(int findpc)
 {
-    //struct history record[100];
+    
     double time;
     double totpayment;
     char* tempArr = malloc(100);
@@ -223,17 +221,16 @@ char * makestringtoreplace(int findpc)
 		token = strtok(line, ", ");
 		
 		strcpy(record[i].username, token);
-		//printf("Name : %s\n", record[i].username);
+		
 
 		token = strtok(NULL, ", ");
-        //printf("%s",token);
+        
         record[i].time = strtod(token,NULL);
-        //printf("%f",record[i].time);
-		//printf("time : %0.2f\n", record[i].time);
+        
 
 		token = strtok(NULL, ", ");
         record[i].cash = strtod(token, NULL);
-		//printf("Payment : %d\n", record[i].cash);
+		
         i++;
         printf("\n");
     }
@@ -244,7 +241,7 @@ char * makestringtoreplace(int findpc)
     int j=sizeof(record) / sizeof(record[0]);
     for(i=0;i<j;i++)
     {
-        // printf("Name : %s\n", record[i].username);
+        
         if(strcmp(record[i].username,login_users[findpc].username)==0)
             break;
     }
@@ -347,13 +344,13 @@ void write_history(int findpc)
 
         //char path[100] = "History.txt";
         /* Delete original source file */
-        int rem = remove("History.txt");
-        printf("%d\n",rem);
+        remove("History.txt");
+        
         /* Rename temp file as original file */
-        int ren = rename("replace.tmp", "History.txt");
-        printf("%d\n",ren);
-        printf("\n history  Successfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
-        //free(oldWord1);
+        rename("replace.tmp", "History.txt");
+        
+        printf("\n history  Successfully replaced all occurrences of '%s' with '%s'.\n", oldWord, newWord);
+        
 
     }
     //append
@@ -433,7 +430,7 @@ char * findstringprepaid(char * oldWord1)
 	}
 
     char line[300];
-    //struct history record[100];
+   
     int i=0;
     char* date = malloc(100);
     char username[20];
@@ -452,7 +449,6 @@ char * findstringprepaid(char * oldWord1)
             prepaid = strtod(token,NULL);
             strcat(date, token);
 
-            printf("old string = %s\n",date);
             break;
         }
     }
@@ -503,21 +499,21 @@ int check_prepaid_deduct(int findpc)
             fputs(buffer, fTemp);
         }
     
-     printf("fifth prepaid error\n");
+     
         /* Close all files to release resource */
         fclose(fPtr);
         fclose(fTemp);
 
     // char path[100] = "prepaid.txt";
         /* Delete original source file */
-        int trm = remove("prepaid.txt");
-        printf("%d\n",trm);
-         printf("sixth prepaid error\n");
+        remove("prepaid.txt");
+        
+         
         /* Rename temp file as original file */
-        int trma = rename("replace1.tmp", "prepaid.txt");
-        printf("%d\n",trma);
-     printf("seventh prepaid error\n");
-        printf("\nprepaid Successfully replaced all occurrences of '%s' with '%s'.", oldWord, newWord);
+         rename("replace1.tmp", "prepaid.txt");
+        
+     
+        printf("\nprepaid Successfully replaced all occurrences of '%s' with '%s'.\n", oldWord, newWord);
         free(oldWord1);
 
 }
@@ -568,18 +564,20 @@ void * thread_login(void *arg)
             double sec = difftime(login_users[findpc].logout,login_users[findpc].login);
             //double h = (sec/3600); 
             login_users[findpc].min = sec;
-            //printf("\n mins = %0.2f",login_users[*findpc].min);
+            
             double payslip=login_users[findpc].min*(per_hour_cost/60);
             login_users[findpc].payment = payslip;
             login_users[findpc].status=0;
-            pthread_mutex_lock(&mutexthread);
+           ////////////// pthread_mutex_lock(&mutexthread);
+           pthread_rwlock_wrlock(&rw_lock);
             write_logged_in(findpc);
-            printf("vatsal------------------------------------------------------------------12345678\n");
+            
             write_history(findpc);
-            printf("vatsal------------------------------------------------------------------123456\n");
+            
             if(prepaiduser(login_users[findpc].username)==true)
                 check_prepaid_deduct(findpc);
-            pthread_mutex_unlock(&mutexthread);
+            pthread_rwlock_unlock(&rw_lock);
+            /////////////pthread_mutex_unlock(&mutexthread);
             printf("\nlogout succesfull of %s from pc No. %d\n" ,login_users[findpc].username ,findpc);
             login_users[findpc]=temp;
             break;
@@ -674,7 +672,7 @@ int login_newuser()
     login_users[findpc].logout=time(NULL);
     login_users[findpc].min=0;
     //creating a thread
-    printf("\n--------------------------------------------------------------%d\n",findpc);
+    //printf("\n--------------------------------------------------------------%d\n",findpc);
     err = pthread_create (&threadID[findpc], NULL, thread_login, (void *)&login_users[findpc]);
 	if (err != 0)
 	    printf("cant create thread: %s\n", strerror(err));
@@ -758,9 +756,9 @@ bool prepaiduserexsist(char* username)
 	        sprintf(snum, "%0.0f", plans);
             strcat(newWord, snum);
             
-            //dup2(fp,fPtr);
+            
             fseek( fp, 0, SEEK_SET );
-            //fPtr  = fopen("prepaid.txt", "r");
+            
             fTemp = fopen("replace3.tmp", "w");
              if ( fTemp == NULL)
             {
