@@ -74,10 +74,10 @@ void setcost();
 void getpcstatus();
 void changepcstatus();
 void logoutall();
-// int sendmsg();
+
 void prepaidplan();
 bool prepaiduserexsist(char* username);
-void upgradePlanBalance();
+
 
 bool check_username_exsist(char* username);
 void write_history(int findpc);

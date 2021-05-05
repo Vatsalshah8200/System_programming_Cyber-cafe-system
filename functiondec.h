@@ -714,7 +714,56 @@ bool prepaiduserexsist(char* username)
 
         if(strcmp(uname,username)==0)
         {
+            char newWord[100],oldWord[100];
+            //FILE * fPtr;
+            FILE * fTemp;
+            int tempSize;
+            char buffer[BUFFER_SIZE];
+            double plans,addbal;
+
+            strcpy(oldWord,username);
+            strcat(oldWord, ", ");
+            token = strtok(NULL, ", ");
+            plans = strtod(token,NULL);
+            strcat(oldWord, token);
+
+            printf("Add amount to Add : - ");
+            scanf("%lf",&addbal);
+            plans=plans+addbal;
+            
+            strcpy(newWord,username);
+            strcat(newWord, ", ");
+            char snum[5];
+	        sprintf(snum, "%0.0f", plans);
+            strcat(newWord, snum);
+            
+            //dup2(fp,fPtr);
+            fseek( fp, 0, SEEK_SET );
+            //fPtr  = fopen("prepaid.txt", "r");
+            fTemp = fopen("replace3.tmp", "w");
+             if ( fTemp == NULL)
+            {
+                /* Unable to open file hence exit */
+                printf("\nUnable to open file.\n");
+                printf("Please check whether file exists and you have read/write privilege.\n");
+                exit(EXIT_SUCCESS);
+            }
+
+            while ((fgets(buffer, BUFFER_SIZE, fp)) != NULL)
+            {
+                // Replace all occurrence of word from current line
+                replaceAll(buffer, oldWord, newWord);
+
+                // After replacing write it to temp file.
+                fputs(buffer, fTemp);
+            }
+            
             fclose(fp);
+            fclose(fTemp);
+            
+            remove("prepaid.txt");
+            rename("replace3.tmp", "prepaid.txt");
+            
             return true;
         }
     }
@@ -722,31 +771,7 @@ bool prepaiduserexsist(char* username)
     return false;
 }
 
-// void upgradePlanBalance()
-// {
-//     FILE * fPtr;
-//     FILE * fTemp;
-//     char path[100];
-//     int tempSize;
-//     char buffer[BUFFER_SIZE];
-//     // char* oldWord1;
-//     char newWord[100],oldWord[100];
 
-//         char username[100];
-//         printf("Enter Username: - ");
-//         scanf("%s",username);
-//         strcpy(oldWord,username);
-//         strcat(oldWord, ", ");
-//         FILE *fp = fopen("prepaid.txt", "r");
-//         char line[300];
-//         char uname[20];
-//         while (fgets(line, sizeof(line), fp))
-// 	    {
-//             char *token;
-// 		    token = strtok(line, ", ");
-//             token = strtok(NULL, ", ");
-
-// }
 
 
 void prepaidplan()
@@ -791,8 +816,7 @@ void prepaidplan()
     }
     else
     {
-        printf("Username exsist");
-        upgradePlanBalance();
+        printf("Username Balance Updated");
     }
 }
 
